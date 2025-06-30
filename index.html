@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vending Machine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="vending-machine">
+        <div class="machine-header">
+            <h2>SNACK MASTER 3000</h2>
+        </div>
+        
+        <div class="display" id="display">
+            CREDIT: <span id="amount">$0.00</span> | <span id="selected-item">SELECT AN ITEM</span>
+        </div>
+        
+        <div class="items-section">
+            <div class="item" id="A1">
+                <div class="item-code">A1</div>
+                <div class="item-name">Chocolate Bar</div>
+                <div class="item-price">$1.50</div>
+                <div class="item-stock">Stock: 5</div>
+            </div>
+            <div class="item" id="A2">
+                <div class="item-code">A2</div>
+                <div class="item-name">Potato Chips</div>
+                <div class="item-price">$1.25</div>
+                <div class="item-stock">Stock: 3</div>
+            </div>
+            <div class="item" id="A3">
+                <div class="item-code">A3</div>
+                <div class="item-name">Pretzels</div>
+                <div class="item-price">$1.00</div>
+                <div class="item-stock">Stock: 7</div>
+            </div>
+            <div class="item" id="B1">
+                <div class="item-code">B1</div>
+                <div class="item-name">Candy</div>
+                <div class="item-price">$0.75</div>
+                <div class="item-stock">Stock: 0</div>
+            </div>
+            <div class="item" id="B2">
+                <div class="item-code">B2</div>
+                <div class="item-name">Granola Bar</div>
+                <div class="item-price">$1.75</div>
+                <div class="item-stock">Stock: 4</div>
+            </div>
+            <div class="item" id="B3">
+                <div class="item-code">B3</div>
+                <div class="item-name">Cookies</div>
+                <div class="item-price">$1.50</div>
+                <div class="item-stock">Stock: 2</div>
+            </div>
+            <div class="item" id="C1">
+                <div class="item-code">C1</div>
+                <div class="item-name">Soda</div>
+                <div class="item-price">$2.00</div>
+                <div class="item-stock">Stock: 6</div>
+            </div>
+            <div class="item" id="C2">
+                <div class="item-code">C2</div>
+                <div class="item-name">Water</div>
+                <div class="item-price">$1.25</div>
+                <div class="item-stock">Stock: 8</div>
+            </div>
+            <div class="item" id="C3">
+                <div class="item-code">C3</div>
+                <div class="item-name">Iced Tea</div>
+                <div class="item-price">$1.75</div>
+                <div class="item-stock">Stock: 1</div>
+            </div>
+        </div>
+        
+        <div class="coin-section">
+            <div class="coin-buttons">
+                <button class="coin-button" id="cent10">10¢</button>
+                <button class="coin-button" id="cent20">20¢</button>
+                <button class="coin-button" id="dollar">$1</button>
+            </div>
+        </div>
+        
+        <button class="cancel-button" id="cancel">Cancel</button>
+        
+        <div class="out-tray" id="out-tray">
+            <div class="tray-flap"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

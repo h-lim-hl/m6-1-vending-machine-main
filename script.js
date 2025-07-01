@@ -48,7 +48,7 @@ function main() {
     return childElement;
   }
 
-  function itemSelected(element) {
+  function itemSelected(element) { // WRONG selected item is remembered and credits needs to be added to get the item user will click cancel to void transaction
     element = getItemButtonElement(element);
 
     const ITEM_NAME = element.dataset.itemName;

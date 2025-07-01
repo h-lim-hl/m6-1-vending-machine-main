@@ -1,6 +1,7 @@
 function main() {
   let machineValue = 0; // total amount in cents in the machine
   let machineDisplay = document.querySelector("#display");
+  let selectedItem = null;
 
   function updateMachineCreditDisplay(amount = machineValue) {
      machineDisplay.querySelector("#amount").textContent = `$ ${(amount / 100.0).toFixed(2)}`;
@@ -48,27 +49,42 @@ function main() {
     return childElement;
   }
 
-  function itemSelected(element) { // WRONG selected item is remembered and credits needs to be added to get the item user will click cancel to void transaction
+  function dispenseItem(element) {
+    updateItemStock(element, ITEM_STOCK - 1);
+    machineValue -= ITEM_COST;
+    
+    const DISPLAY_INNERHTML = machineDisplay.innerHTML;
+    machineDisplay.innerHTML = "Dispensing Product";
+    machineDisplay.classList.add("fade-out");
+    setTimeout(function(innerHtml) {
+      machineDisplay.innerHTML = DISPLAY_INNERHTML;
+      resetMachineCreditItemDisplay();
+    }, 3000, DISPLAY_INNERHTML);
+  }
+
+  function dispenseWhenReady() {
+    if(!selectedItem) return;
+
+    const ITEM_COST = element.dataset.itemCost;
+    const ITEM_STOCK = element.dataset.itemStock;
+    if(0 < ITEM_STOCK && ITEM_COST <= machineValue) {
+      dispenseItem(selectedItem);
+    }
+  }
+
+  function itemSelected(element) {
     element = getItemButtonElement(element);
+    selectedItem = element;
 
     const ITEM_NAME = element.dataset.itemName;
     const ITEM_COST = element.dataset.itemCost;
     const ITEM_STOCK = element.dataset.itemStock;
 
-    if (machineValue < ITEM_COST) {
+    if (machineValue < ITEM_COST) { // if insufficent funds
       updateMachineCreditItemDisplay(machineValue - ITEM_COST, ITEM_NAME);
       machineDisplayTimedReset();
-    } else if (0 < ITEM_STOCK) {
-      updateItemStock(element, ITEM_STOCK - 1);
-      machineValue -= ITEM_COST;
-      
-      const DISPLAY_INNERHTML = machineDisplay.innerHTML;
-      machineDisplay.innerHTML = "Dispensing Product";
-      machineDisplay.classList.add("fade-out");
-      setTimeout(function(innerHtml) {
-        machineDisplay.innerHTML = DISPLAY_INNERHTML;
-        resetMachineCreditItemDisplay();
-      }, 3000, DISPLAY_INNERHTML);
+    } else if (0 < ITEM_STOCK) { // if has stock
+      dispenseItem(selectedItem);
     }
   }
 
@@ -114,6 +130,7 @@ function main() {
       button.addEventListener("click", function (event) {
         machineValue += parseInt(button.dataset.amount);
         updateMachineCreditDisplay(machineValue);
+        dispenseWhenReady();
       });
     });
   }
@@ -128,6 +145,7 @@ function main() {
         getStockAmountFromTextContext(button.querySelector(".item-stock"));
 
       button.addEventListener("click", function (event) {
+        if(selectedItem) return; // ignore if previously an item was selected
         const element = event.target;
         itemSelected(element);
       });
@@ -139,6 +157,7 @@ function main() {
     let cancelButton = document.querySelector("#cancel");
     cancelButton.addEventListener("click", function () {
       machineValue = 0;
+      selectedItem = null;
       resetMachineCreditItemDisplay();
     });
   }

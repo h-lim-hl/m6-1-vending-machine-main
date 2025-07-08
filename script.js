@@ -3,11 +3,19 @@ function main() {
   let machineDisplay = document.querySelector("#display");
   let selectedItem = null;
 
-  function updateMachineCreditDisplay(amount = machineValue) {
-     machineDisplay.querySelector("#amount").textContent = `$ ${(amount / 100.0).toFixed(2)}`;
+  function DEBUG_STRING() {
+    return `
+      machineValue ${machineValue}
+      machineDisplay ${machineDisplay}
+      selectedItem ${selectedItem}
+      `;
   }
 
-  function updateMachineItemDisplay(name = "SELECT AN ITEM") {
+  function updateMachineCreditDisplay(amount) {
+    machineDisplay.querySelector("#amount").textContent = `$ ${(amount / 100.0).toFixed(2)}`;
+  }
+
+  function updateMachineItemDisplay(name) {
     machineDisplay.querySelector("#selected-item").textContent = name;
   }
 
@@ -16,10 +24,17 @@ function main() {
     updateMachineItemDisplay(name);
   }
 
+  function resetMachineCreditDisplay() {
+    updateMachineCreditDisplay(0);
+  }
+
+  function resetMachineItemDisplay() {
+    updateMachineItemDisplay("SELECT AN ITEM");
+  }
+
   function resetMachineCreditItemDisplay() {
-    machineDisplay.classList.remove("fade-out");
-    updateMachineCreditDisplay();
-    updateMachineItemDisplay();
+    resetMachineCreditDisplay();
+    resetMachineItemDisplay();
   }
 
   function machineDisplayTimedReset(mSec = 1000) {
@@ -27,7 +42,6 @@ function main() {
   }
 
   function updateItemStock(element, num) {
-    console.log(element);
     element.dataset.itemStock = num;
     element.querySelector(".item-stock").textContent = `Stock: ${num}`;
   }
@@ -49,43 +63,39 @@ function main() {
     return childElement;
   }
 
-  function dispenseItem(element) {
-    updateItemStock(element, ITEM_STOCK - 1);
-    machineValue -= ITEM_COST;
-    
-    const DISPLAY_INNERHTML = machineDisplay.innerHTML;
-    machineDisplay.innerHTML = "Dispensing Product";
-    machineDisplay.classList.add("fade-out");
-    setTimeout(function(innerHtml) {
-      machineDisplay.innerHTML = DISPLAY_INNERHTML;
-      resetMachineCreditItemDisplay();
-    }, 3000, DISPLAY_INNERHTML);
-  }
-
   function dispenseWhenReady() {
-    if(!selectedItem) return;
+    if (!selectedItem) { return; }
+    const ITEM_COST = selectedItem.dataset.itemCost;
+    const ITEM_STOCK = selectedItem.dataset.itemStock;
 
-    const ITEM_COST = element.dataset.itemCost;
-    const ITEM_STOCK = element.dataset.itemStock;
-    if(0 < ITEM_STOCK && ITEM_COST <= machineValue) {
-      dispenseItem(selectedItem);
+    // Dispense if has stock and macine value >= item cost
+    if (0 < ITEM_STOCK && ITEM_COST <= machineValue) {
+      machineValue -= ITEM_COST;
+      updateItemStock(selectedItem, ITEM_STOCK - 1);
+      selectedItem = undefined;
+
+      // Fade out feature
+      const DISPLAY_INNERHTML = machineDisplay.innerHTML;
+      machineDisplay.innerHTML = "Dispensing Product";
+      machineDisplay.classList.add("fade-out");
+
+      // Restore display
+      setTimeout(function (innerHtml) {
+        machineDisplay.innerHTML = DISPLAY_INNERHTML;
+        machineDisplay.classList.remove("fade-out");
+        updateMachineCreditDisplay(machineValue);
+        resetMachineItemDisplay();
+      }, 3000, DISPLAY_INNERHTML);
     }
   }
 
   function itemSelected(element) {
     element = getItemButtonElement(element);
     selectedItem = element;
-
-    const ITEM_NAME = element.dataset.itemName;
-    const ITEM_COST = element.dataset.itemCost;
-    const ITEM_STOCK = element.dataset.itemStock;
-
-    if (machineValue < ITEM_COST) { // if insufficent funds
-      updateMachineCreditItemDisplay(machineValue - ITEM_COST, ITEM_NAME);
-      machineDisplayTimedReset();
-    } else if (0 < ITEM_STOCK) { // if has stock
-      dispenseItem(selectedItem);
-    }
+    const ITEM_NAME = selectedItem.dataset.itemName;
+    const ITEM_COST = selectedItem.dataset.itemCost;
+    updateMachineCreditItemDisplay(machineValue - ITEM_COST, ITEM_NAME);
+    dispenseWhenReady(selectedItem);
   }
 
   function getCentsAmountFromTextContext(element) {
@@ -127,9 +137,12 @@ function main() {
     let coinButtons = document.querySelectorAll(".coin-button");
     coinButtons.forEach(function (button) {
       button.dataset.amount = getCentsAmountFromTextContext(button);
+
+      // OnClick Event
       button.addEventListener("click", function (event) {
         machineValue += parseInt(button.dataset.amount);
-        updateMachineCreditDisplay(machineValue);
+        let toDisplayAmount = machineValue - (selectedItem ? selectedItem.dataset.itemCost : 0);
+        updateMachineCreditDisplay(toDisplayAmount);
         dispenseWhenReady();
       });
     });
@@ -144,10 +157,10 @@ function main() {
       button.dataset.itemStock =
         getStockAmountFromTextContext(button.querySelector(".item-stock"));
 
+      // OnClick Event
       button.addEventListener("click", function (event) {
-        if(selectedItem) return; // ignore if previously an item was selected
-        const element = event.target;
-        itemSelected(element);
+        if (selectedItem) return; // ignore if previously an item was selected
+        itemSelected(event.target);
       });
     });
 

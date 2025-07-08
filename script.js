@@ -75,17 +75,19 @@ function main() {
       selectedItem = undefined;
 
       // Fade out feature
-      const DISPLAY_INNERHTML = machineDisplay.innerHTML;
-      machineDisplay.innerHTML = "Dispensing Product";
-      machineDisplay.classList.add("fade-out");
+      const DISPLAY_CHILDREN = Array.from(machineDisplay.childNodes);
+
+      let fadeElement = document.createElement('span');
+      fadeElement.textContent = "Dispensing Product";
+      fadeElement.classList.add("fade-out");
+      machineDisplay.replaceChildren(fadeElement);
 
       // Restore display
-      setTimeout(function (innerHtml) {
-        machineDisplay.innerHTML = DISPLAY_INNERHTML;
-        machineDisplay.classList.remove("fade-out");
+      setTimeout(function () {
+        machineDisplay.replaceChildren(...DISPLAY_CHILDREN);
         updateMachineCreditDisplay(machineValue);
         resetMachineItemDisplay();
-      }, 3000, DISPLAY_INNERHTML);
+      }, 3000);
     }
   }
 
